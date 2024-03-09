@@ -1,18 +1,14 @@
 const mongoose = require("mongoose");
 
 const salesSchema = new mongoose.Schema({
-    saleId: {
-        type: String
-    },
+    // saleId: {
+    //     type: String
+    // },
     timestamp: { // Timestamp of the sale
         type: Date,
         dafault: Date.now
     },
     flightNumber: {
-        type: String,
-        required: true,
-    },
-    flightDate: {
         type: String,
         required: true,
     },
@@ -29,7 +25,7 @@ const salesSchema = new mongoose.Schema({
         required: true,
     },
     total: {
-        type: Double,
+        type: Number,
         required: true,
     },
 })
