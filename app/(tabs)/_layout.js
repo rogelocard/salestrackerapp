@@ -34,7 +34,7 @@ export default function Layout() {
                         <Feather name="eye" size={24} color="gray" />
                     )
                 }}
-            />
+            />    
         </Tabs>
     )
 }
