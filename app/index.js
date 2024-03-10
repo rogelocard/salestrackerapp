@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 const index = () => {
     return (
-        <Redirect href="/(authenticate)/login"/> 
+        <Redirect href="/(authenticate)/login"/>
     )
 }
 

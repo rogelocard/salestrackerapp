@@ -25,6 +25,8 @@ app.use(bodyParser.json());
 
 const jwt = require("jsonwebtoken")
 const User = require("./models/user")
+const Sale = require("./models/sale")
+
 
 /**
  * Conection to the Database Atlas MongoDB
@@ -168,3 +170,36 @@ app.post("/login", async(req, res) => {
         res.status(500).json({message: "Falló en el login"})
     }
 })
+/******************************
+ * endpoint a registrar ventas 
+ ******************************
+*/
+app.post("/index", async (req, res) => {
+    console.log("ingreso:",req.body);
+    try {
+        const { timestamp, flightNumber, route, barsetId, reportImage, total} = req.body;
+        //crear nueva venta
+        const newSale = new Sale({
+            timestamp, flightNumber, route, barsetId, reportImage, total,
+        });
+        const venta  = await newSale.save();
+        console.log("Ingreso correctamente la venta",venta);
+        res.status(200).json({ message: "Ingreso correctamente la venta"})
+    } catch (error) {
+        console.log("Error: al ingresar la venta")
+        res.status(500).json({ message: "Error al ingresra la venta" })
+    }
+})
+/*************************************
+ * endpoint to fetch all sales records
+ *************************************
+*/
+app.get("/sales", async (req, res) => {
+    try {
+      const records = await Sale.find();
+      console.log("Records: ", records)
+      res.status(200).json(records);
+    } catch (error) {
+      res.status(500).json({ message: "Failed retrieving sales data" });
+    }
+  });
