@@ -6,7 +6,7 @@ const salesSchema = new mongoose.Schema({
     // },
     timestamp: { // Timestamp of the sale
         type: Date,
-        dafault: Date.now
+        default: Date.now
     },
     flightNumber: {
         type: String,
@@ -22,7 +22,7 @@ const salesSchema = new mongoose.Schema({
     },
     reportImage: { // Image from the tablet's report
         type: String,
-        required: true,
+        required: false,
     },
     total: {
         type: Number,

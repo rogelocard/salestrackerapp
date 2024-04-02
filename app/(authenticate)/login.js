@@ -19,6 +19,7 @@ const login = () => {
       email: email, 
       password: password
     }
+    
     axios.post(`${API_HOST}/login`, user).then((response) => {
         console.log("response", response);
         const token = response.data.token

@@ -190,3 +190,16 @@ app.post("/index", async (req, res) => {
         res.status(500).json({ message: "Error al ingresra la venta" })
     }
 })
+/*************************************
+ * endpoint to fetch all sales records
+ *************************************
+*/
+app.get("/sales", async (req, res) => {
+    try {
+      const records = await Sale.find();
+      console.log("Records: ", records)
+      res.status(200).json(records);
+    } catch (error) {
+      res.status(500).json({ message: "Failed retrieving sales data" });
+    }
+  });
