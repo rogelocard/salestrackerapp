@@ -26,6 +26,7 @@ import { API_HOST } from '@env'
 import { useRouter } from "expo-router";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function app(){
@@ -33,22 +34,41 @@ export default function app(){
   const [input, setInput] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchSalesData = async () => {
-      try {
-        const response = await axios.get(`${API_HOST}/sales`);
-        setSales(response.data);
-      } catch (error) {
-        console.log("Error fetching records", error);
-      }
-    };
-    fetchSalesData();
+  // useEffect(() => {
+  //   const fetchSalesData = async () => {
+  //     try {
+  //       const response = await axios.get(`${API_HOST}/sales`);
+  //       setSales(response.data);
+  //     } catch (error) {
+  //       console.log("Error fetching records", error);
+  //     }
+  //   };
+  //   fetchSalesData();
 
+  // }, []);
+
+  const fetchSalesData = async () => {
+    try {
+      const response = await axios.get(`${API_HOST}/sales`);
+      setSales(response.data);
+    } catch (error) {
+      console.error("Error fetching sales data", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSalesData();
   }, []);
 
   console.log("Data from GET API: ", sales)
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSale, setSelectedSale] = useState(null);
+
+  const openModalWithSale = (sale) => {
+    setSelectedSale(sale);
+    setModalVisible(true);
+  }
 
   return (
     <View style={styles.container}>
@@ -78,12 +98,13 @@ export default function app(){
           // <SearchResults data={sales} input={input} setInput={setInput} />
           <FlatList data={sales} renderItem={({item}) => {
             if (item?.flightNumber.toLowerCase().includes(input.toLowerCase())){
-              const dateString = item?.timestamp.split('T')[0];
+              const dateString = item?.timestamp ? item?.timestamp.split('T')[0] : 'Fecha no disponible';
+              const dateStringReport = selectedSale?.timestamp ? selectedSale.timestamp.split('T')[0] : 'Fecha no disponible';
 
               // Generate report to PDF
               const html = `
                 <html>
-                  <body>
+                  <body> 
                     <h1 style="
                       color: #FFFFFF; 
                       background: #840032;
@@ -95,10 +116,11 @@ export default function app(){
                     </h1>
                     <hr/>
                     <br/>
-                    <p><span style="font-weight: bold;">Ruta Vuelo:</span>${item?.route}</p>
-                    <p><span style="font-weight: bold;">Número vuelo:</span>${item?.flightNumber}</p>
-                    <p><span style="font-weight: bold;">Fecha:</span>${dateString}</p>
-                    <p><span style="font-weight: bold;">Total:</span>${item?.total}</p>
+                    <p><span style="font-weight: bold;">Ruta Vuelo:</span>${selectedSale?.route}</p>
+                    <p><span style="font-weight: bold;">Número vuelo:</span>${selectedSale?.flightNumber}</p>
+                    <p><span style="font-weight: bold;">Barset:</span>${selectedSale?.barsetId}</p>
+                    <p><span style="font-weight: bold;">Fecha:</span>${dateStringReport}</p>
+                    <p><span style="font-weight: bold;">Total:</span>${selectedSale?.total}</p>
                     <hr/>
                   </body>
                 </html>
@@ -117,7 +139,7 @@ export default function app(){
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         style={styles.button}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => openModalWithSale(item)}
                     >
                         <FontAwesome name="plane" size={20} color="#fff" />
                         <Text style={styles.buttonText}>
@@ -135,14 +157,14 @@ export default function app(){
                     >
                         <View style={styles.centeredView}>
                         <View style={styles.modalView}>
-                            <Text style={styles.modalText}> <Text style={{fontWeight: "bold"}}>Ruta Vuelo:</Text> {item?.route}</Text>
-                            <Text style={styles.modalText}><Text style={{fontWeight: "bold"}}>Numero Vuelo:</Text> {item?.flightNumber}</Text>
-                            <Text style={styles.modalText}><Text style={{fontWeight: "bold"}}>Fecha:</Text> {dateString}</Text>
-                            <Text style={styles.modalText}><Text style={{fontWeight: "bold"}}>Total:</Text> {item?.total}</Text>
-                            <Image
+                            <Text style={styles.modalText}> <Text style={{fontWeight: "bold"}}>Ruta Vuelo:</Text> {selectedSale?.route}</Text>
+                            <Text style={styles.modalText}><Text style={{fontWeight: "bold"}}>Numero Vuelo:</Text> {selectedSale?.flightNumber}</Text>
+                            <Text style={styles.modalText}><Text style={{fontWeight: "bold"}}>Fecha:</Text> {dateStringReport}</Text>
+                            <Text style={styles.modalText}><Text style={{fontWeight: "bold"}}>Total:</Text> {selectedSale?.total}</Text>
+                            {/* <Image
                             style={styles.image}
                             source={{ uri: "https://picsum.photos/200/200" }}
-                            />
+                            /> */}
                             <TouchableOpacity
                             style={[styles.button, styles.buttonModal]}
                             onPress={generatePdf}
